@@ -1,0 +1,135 @@
+---
+import Layout from "$/layouts/Layout.astro";
+---
+
+<Layout
+  title="Fast Speed Test"
+  description="Mide la velocidad de tu conexión a internet de forma rápida y sencilla. Conoce tu velocidad de descarga, subida y ping con nuestra herramienta gratuita."
+>
+  <main
+    class="container mx-auto px-8 py-12 flex flex-col items-center justify-center gap-y-12"
+  >
+    <h1
+      class="~text-4xl/5xl font-bold text-violet-300 bg-clip-text text-transparent bg-gradient-to-r from-violet-400 to-violet-600 [text-shadow:0_0_15px_rgba(167,139,250,0.5)]"
+    >
+      Test de Velocidad
+    </h1>
+    <div class="grid w-full ~max-w-72/xs gap-6">
+      <div
+        class="p-10 gap-y-4 rounded-full aspect-square w-full h-full grid justify-items-center place-content-center shadow-lg border border-violet-500/20 bg-neutral-800 after:content-[''] after:absolute after after:-inset-4 after:blur-2xl after:bg-violet-500/20 after:rounded-full relative after:animate-pulse after:opacity-0 after:duration-1000"
+      >
+        <h2 class="font-bold text-violet-300 text-center">Descarga</h2>
+        <div
+          class="flex justify-center items-center flex-col gap-y-2 text-4xl font-bold text-violet-400 [text-shadow:0_0_15px_rgba(167,139,250,0.5)]"
+        >
+          <span class="~text-6xl/7xl" id="download-speed">0</span>
+          <span class="text-2xl">Mbps</span>
+        </div>
+      </div>
+      <!-- <div
+        class="p-12 gap-y-2 rounded-full aspect-square w-full h-full grid place-content-center shadow-lg border border-violet-500/20"
+      >
+        <h2 class="font-bold text-violet-300">Subida</h2>
+        <div
+          class="flex justify-center items-center flex-col gap-y-2 text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-violet-500 [text-shadow:0_0_15px_rgba(167,139,250,0.5)]"
+        >
+          <span class="text-2xl" id="upload-speed">0</span>
+          <span class="text-2xl">Mbps</span>
+        </div>
+      </div>
+      <div
+        class="p-12 gap-y-2 rounded-full aspect-square w-full h-full grid place-content-center shadow-lg border border-violet-500/20"
+      >
+        <h2 class="font-bold text-violet-300">Ping</h2>
+        <div
+          class="flex justify-center items-center flex-col gap-y-2 text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-violet-500 [text-shadow:0_0_15px_rgba(167,139,250,0.5)]"
+        >
+          <span class="text-2xl" id="ping">0</span>
+          <span class="text-2xl">ms</span>
+        </div>
+      </div> -->
+      <button
+        id="start-test"
+        class="bg-violet-600 text-white px-8 py-3 rounded-xl font-medium hover:bg-violet-700 transition-colors shadow-lg hover:shadow-violet-500/25"
+      >
+        Iniciar Test
+      </button>
+    </div>
+  </main>
+</Layout>
+
+<script>
+  const $startBtn = document.getElementById("start-test") as HTMLButtonElement;
+  const $downloadSpeedEl = document.getElementById(
+    "download-speed"
+  ) as HTMLParagraphElement;
+
+  let isRunning = false;
+  let abortController: AbortController | null = null;
+
+  async function measureSpeed() {
+    if (isRunning) {
+      abortController?.abort();
+      $startBtn.textContent = "Iniciar Test";
+      isRunning = false;
+      return;
+    }
+
+    isRunning = true;
+    abortController = new AbortController();
+    $startBtn.textContent = "Detener";
+    $downloadSpeedEl.textContent = "0";
+    $downloadSpeedEl.classList.add("animate-pulse");
+
+    try {
+      const testDuration = 10000;
+      const updateInterval = 700;
+      let totalBitsLoaded = 0;
+      const startTime = performance.now();
+      let measurementCount = 0;
+      const measurements = 3;
+
+      const imageUrl =
+        "https://upload.wikimedia.org/wikipedia/commons/1/1f/As08-16-2593.jpg";
+
+      while (performance.now() - startTime < testDuration && isRunning) {
+        const response = await fetch(imageUrl, {
+          signal: abortController.signal,
+        });
+        const blob = await response.blob();
+        totalBitsLoaded += blob.size * 8;
+
+        measurementCount++;
+
+        if (measurementCount >= measurements) {
+          $downloadSpeedEl.classList.remove("animate-pulse");
+          const currentDuration = performance.now() - startTime;
+          const currentSpeedMbps = (
+            totalBitsLoaded /
+            currentDuration /
+            1000
+          ).toFixed(2);
+          $downloadSpeedEl.textContent = currentSpeedMbps;
+        }
+
+        await new Promise((resolve) => setTimeout(resolve, updateInterval));
+      }
+
+      if (isRunning) {
+        const finalDuration = performance.now() - startTime;
+        const finalSpeedMbps = (totalBitsLoaded / finalDuration / 1000).toFixed(
+          2
+        );
+        $downloadSpeedEl.textContent = finalSpeedMbps;
+      }
+    } catch (error) {
+      console.error("Error al medir la velocidad:", error);
+    } finally {
+      isRunning = false;
+      $startBtn.textContent = "Iniciar Test";
+      $downloadSpeedEl.classList.remove("animate-pulse");
+    }
+  }
+
+  $startBtn.addEventListener("click", measureSpeed);
+</script>

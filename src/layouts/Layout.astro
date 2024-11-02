@@ -1,0 +1,132 @@
+---
+import Footer from "$/components/Footer.astro";
+import { AstroFont } from "astro-font";
+import { SEO } from "astro-seo";
+import { ViewTransitions } from "astro:transitions";
+
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+const url = Astro.url;
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <AstroFont
+      config={[
+        {
+          name: "Poppins",
+          src: [
+            {
+              style: "normal",
+              weight: "400",
+              path: "https://fonts.gstatic.com/s/poppins/v20/pxiEyp8kv8JHgFVrJJfecg.woff2",
+            },
+            {
+              style: "normal",
+              weight: "500",
+              path: "https://fonts.gstatic.com/s/poppins/v20/pxiByp8kv8JHgFVrLGT9Z1xlFQ.woff2",
+            },
+            {
+              style: "normal",
+              weight: "600",
+              path: "https://fonts.gstatic.com/s/poppins/v20/pxiByp8kv8JHgFVrLEj6Z1xlFQ.woff2",
+            },
+            {
+              style: "normal",
+              weight: "700",
+              path: "https://fonts.gstatic.com/s/poppins/v20/pxiByp8kv8JHgFVrLCz7Z1xlFQ.woff2",
+            },
+          ],
+          preload: true,
+          display: "swap",
+          selector: "body",
+          fallback: "sans-serif",
+        },
+      ]}
+    />
+    <SEO
+      {title}
+      {description}
+      openGraph={{
+        image: {
+          url: `${url}banner.webp`,
+          type: "image/webp",
+          width: 225,
+          height: 167,
+          secureUrl: `${url}banner.webp`,
+          alt: "banner de test de velocidad de internet",
+        },
+        basic: {
+          title: title,
+          type: "website",
+          image: `${url}banner.webp`,
+        },
+      }}
+      twitter={{
+        title: title,
+        image: `${url}banner.webp`,
+        creator: "@marcosbonilla29",
+        description: description,
+        site: `${url}`,
+        card: "summary_large_image",
+        imageAlt: "banner de test de velocidad de internet",
+      }}
+      extend={{
+        link: [{ rel: "icon", href: "/favicon.svg" }],
+        meta: [
+          {
+            name: "twitter:image",
+            content: `${url}banner.webp`,
+          },
+          { name: "twitter:title", content: title },
+          { name: "twitter:description", content: description },
+          { name: "apple-mobile-web-app-title", content: title },
+          { name: "author", content: "marcos leandro bonilla borges" },
+          { name: "copyright", content: "maxcoding" },
+          {
+            name: "keywords",
+            content:
+              "git, comandos git, git español, control de versiones, repositorio, commit, push, pull, merge, branch, git flow, github, gitlab, bitbucket, git bash, git terminal, git comandos básicos, git tutorial español",
+          },
+          { name: "language", content: "spanish" },
+          { property: "og:locale", content: "es-BO" },
+          { name: "apple-mobile-web-app-content", content: "yes" },
+          { name: "robots", content: "index, follow" },
+          {
+            name: "apple-mobile-web-app-status-bar-style",
+            content: "black-translucent",
+          },
+          { httpEquiv: "cache-control", content: "no-cache" },
+          { httpEquiv: "expires", content: "180" },
+          { name: "theme-color", content: "hsl(259,89%,66%)" },
+          {
+            name: "msapplication-navbutton-color",
+            content: "hsl(259,89%,66%)",
+          },
+        ],
+      }}
+    />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <ViewTransitions />
+  </head>
+  <body>
+    <slot />
+    <Footer />
+  </body>
+</html>
+
+<style is:global>
+  html {
+    @apply bg-neutral-800 text-neutral-50;
+  }
+  body {
+    @apply h-full min-h-dvh w-screen overflow-x-hidden grid grid-rows-[1fr_auto];
+  }
+</style>
